@@ -399,35 +399,39 @@ fn if_else() {
     let test_str = "if (x == 3) { y; } else { z; }";
     let mut l = Lexer::new(test_str);
 
-    assert_eq!(l.read_token().unwrap(), Token::Keyword(Keyword::If));
-    assert_eq!(l.read_token().unwrap(), Token::Symbol(Symbol::OpeningParen));
-    assert_eq!(l.read_token().unwrap(), Token::Ident("x".to_string()));
-    assert_eq!(l.read_token().unwrap(), Token::Symbol(Symbol::Eq));
-    assert_eq!(l.read_token().unwrap(), Token::NumInt(3));
-    assert_eq!(l.read_token().unwrap(), Token::Symbol(Symbol::ClosingParen));
+    assert_eq!(l.read_token(), Ok(Token::Keyword(Keyword::If)));
+    assert_eq!(l.read_token(), Ok(Token::Symbol(Symbol::OpeningParen)));
+    assert_eq!(l.read_token(), Ok(Token::Ident("x".to_string())));
+    assert_eq!(l.read_token(), Ok(Token::Symbol(Symbol::Eq)));
+    assert_eq!(l.read_token(), Ok(Token::NumInt(3)));
+    assert_eq!(l.read_token(), Ok(Token::Symbol(Symbol::ClosingParen)));
 
-    assert_eq!(
-        l.read_token().unwrap(),
-        Token::Symbol(Symbol::OpeningCurlyBrac)
-    );
-    assert_eq!(l.read_token().unwrap(), Token::Ident("y".to_string()));
-    assert_eq!(l.read_token().unwrap(), Token::Symbol(Symbol::Semicolon));
+    assert_eq!(l.read_token(), Ok(Token::Symbol(Symbol::OpeningCurlyBrac)));
+    assert_eq!(l.read_token(), Ok(Token::Ident("y".to_string())));
+    assert_eq!(l.read_token(), Ok(Token::Symbol(Symbol::Semicolon)));
+    assert_eq!(l.read_token(), Ok(Token::Symbol(Symbol::ClosingCurlyBrac)));
+
+    assert_eq!(l.read_token(), Ok(Token::Keyword(Keyword::Else)));
+    assert_eq!(l.read_token(), Ok(Token::Symbol(Symbol::OpeningCurlyBrac)));
+    assert_eq!(l.read_token(), Ok(Token::Ident("z".to_string())));
+    assert_eq!(l.read_token(), Ok(Token::Symbol(Symbol::Semicolon)));
     assert_eq!(
         l.read_token().unwrap(),
         Token::Symbol(Symbol::ClosingCurlyBrac)
     );
+    assert_eq!(l.read_token(), Err("eof reached".to_string()));
+}
 
-    assert_eq!(l.read_token().unwrap(), Token::Keyword(Keyword::Else));
-    assert_eq!(
-        l.read_token().unwrap(),
-        Token::Symbol(Symbol::OpeningCurlyBrac)
-    );
-    assert_eq!(l.read_token().unwrap(), Token::Ident("z".to_string()));
-    assert_eq!(l.read_token().unwrap(), Token::Symbol(Symbol::Semicolon));
-    assert_eq!(
-        l.read_token().unwrap(),
-        Token::Symbol(Symbol::ClosingCurlyBrac)
-    );
+#[test]
+fn string_and_char() {
+    let test_str = "char abc = 'a'; \"oie\"";
+    let mut l = Lexer::new(test_str);
+    assert_eq!(l.read_token(), Ok(Token::Keyword(Keyword::Char)));
+    assert_eq!(l.read_token(), Ok(Token::Ident("abc".to_string())));
+    assert_eq!(l.read_token(), Ok(Token::Symbol(Symbol::Assign)));
+    assert_eq!(l.read_token(), Ok(Token::Char('a')));
+    assert_eq!(l.read_token(), Ok(Token::Symbol(Symbol::Semicolon)));
+    assert_eq!(l.read_token(), Ok(Token::String("oie".to_string())));
     assert_eq!(l.read_token(), Err("eof reached".to_string()));
 }
 
