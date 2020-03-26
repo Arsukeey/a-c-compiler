@@ -2,33 +2,8 @@ use crate::enums::{Keyword, Symbol, TokenValue};
 use std::iter::Peekable;
 use std::str::Chars;
 
-/*
-pub struct Token {
-    pub value: TokenValue,
-    pub space: bool, // leading space
-
-    // for error outputting
-    pub line: usize,
-    pub column: usize,
-}
- */
-
 pub type Token = TokenValue;
 type LexResult = Result<Token, String>;
-
-/*
-impl Token {
-    pub fn new(value: TokenValue, line: usize, column: usize) -> Self {
-        Self {
-            value,
-            space: false,
-
-            line,
-            column,
-        }
-    }
-}
-*/
 
 pub struct Lexer<'a> {
     input: Peekable<Chars<'a>>,
