@@ -1,3 +1,5 @@
+use std::fmt;
+
 #[derive(Debug, PartialEq, Clone)]
 pub enum Keyword {
     Char,
@@ -10,6 +12,7 @@ pub enum Keyword {
     Unsigned,
     Long,
     Double,
+    Short,
 
     // Structures
     If,
@@ -23,8 +26,26 @@ pub enum Keyword {
     Break,
     Continue,
     Return,
+    Goto,
 
     Sizeof,
+
+    Extern,
+    Static,
+    Auto,
+    Restrict,
+    Register,
+    Const,
+    ConstExpr,
+    Volatile,
+
+    Typedef,
+    Struct,
+    Enum,
+    Union,
+
+    Noreturn,
+    Inline,
 }
 
 #[derive(Debug, PartialEq, Clone)]
@@ -79,7 +100,9 @@ pub enum Symbol {
     AssignXor,
     AssignOr,
 
+    Question,
     Hash,
+    Vararg,
 }
 
 #[derive(Debug, PartialEq, Clone)]
@@ -115,6 +138,7 @@ impl Keyword {
             "unsigned" => Ok(Keyword::Unsigned),
             "long" => Ok(Keyword::Long),
             "double" => Ok(Keyword::Double),
+            "short" => Ok(Keyword::Short),
 
             // Structures
             "if" => Ok(Keyword::If),
@@ -129,6 +153,24 @@ impl Keyword {
             "continue" => Ok(Keyword::Continue),
             "return" => Ok(Keyword::Return),
             "sizeof" => Ok(Keyword::Sizeof),
+
+            "extern" => Ok(Keyword::Extern),
+            "static" => Ok(Keyword::Static),
+            "auto" => Ok(Keyword::Auto),
+            "restrict" => Ok(Keyword::Restrict),
+            "register" => Ok(Keyword::Register),
+            "const" => Ok(Keyword::Const),
+            "constexpr" => Ok(Keyword::ConstExpr),
+            "volatile" => Ok(Keyword::Volatile),
+
+            "typedef" => Ok(Keyword::Typedef),
+            "struct" => Ok(Keyword::Struct),
+            "enum" => Ok(Keyword::Enum),
+            "union" => Ok(Keyword::Union),
+
+            "noreturn" => Ok(Keyword::Noreturn),
+            "inline" => Ok(Keyword::Inline),
+            "goto" => Ok(Keyword::Goto),
 
             x => Err(format!("{} not expected in Keyword::get()", x)),
         }
@@ -191,8 +233,132 @@ impl Symbol {
             "|=" => Ok(Symbol::AssignOr),
 
             "#" => Ok(Symbol::Hash),
+            "?" => Ok(Symbol::Question),
+            "..." => Ok(Symbol::Vararg),
             x => Err(format!("{} not expected in Symbol:::get()", x)),
         }
+    }
+}
+
+impl fmt::Display for TokenValue {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            Self::Keyword(kw) => write!(f, "{}", kw),
+            Self::Ident(st) => write!(f, "{}", st),
+            Self::NumInt(n) => write!(f, "{}", n),
+            Self::NumFloat(n) => write!(f, "{}", n),
+            Self::String(st) => write!(f, "{}", st),
+            Self::Char(c) => write!(f, "{}", c),
+            Self::Symbol(sym) => write!(f, "{}", sym),
+            Self::Newline => write!(f, "\n"),
+        }
+    }
+}
+
+impl fmt::Display for Keyword {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        let m = match self {
+            Keyword::Char => "char",
+            Keyword::Int => "int",
+            Keyword::Float => "float",
+            Keyword::Void => "void",
+            Keyword::Signed => "signed",
+            Keyword::Unsigned => "unsigned",
+            Keyword::Long => "long",
+            Keyword::Double => "double",
+            Keyword::Short => "short",
+            Keyword::If => "if",
+            Keyword::Else => "else",
+            Keyword::For => "for",
+            Keyword::Do => "do",
+            Keyword::While => "while",
+            Keyword::Switch => "switch",
+            Keyword::Case => "case",
+            Keyword::Default => "default",
+            Keyword::Break => "break",
+            Keyword::Continue => "continue",
+            Keyword::Return => "return",
+            Keyword::Sizeof => "sizeof",
+            Keyword::Extern => "extern",
+            Keyword::Static => "static",
+            Keyword::Auto => "auto",
+            Keyword::Restrict => "restrict",
+            Keyword::Register => "register",
+            Keyword::Const => "const",
+            Keyword::ConstExpr => "constexpr",
+            Keyword::Volatile => "volatile",
+            Keyword::Typedef => "typedef",
+            Keyword::Struct => "struct",
+            Keyword::Enum => "enum",
+            Keyword::Union => "union",
+            Keyword::Noreturn => "noreturn",
+            Keyword::Inline => "inline",
+            Keyword::Goto => "goto",
+        };
+
+        write!(f, "{}", m)
+    }
+}
+
+impl fmt::Display for Symbol {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        let m = match self {
+            Symbol::OpeningParen => "(",
+            Symbol::ClosingParen => ")",
+
+            Symbol::OpeningCurlyBrac => "{",
+            Symbol::ClosingCurlyBrac => "}",
+
+            Symbol::OpeningSquareBrac => "[",
+            Symbol::ClosingSquareBrac => "]",
+
+            Symbol::Comma => ",",
+            Symbol::Semicolon => ";",
+            Symbol::Colon => ":",
+            Symbol::Point => ".",
+            Symbol::Arrow => "->",
+            Symbol::Inc => "++",
+            Symbol::Dec => "--",
+            Symbol::Add => "+",
+            Symbol::Sub => "-",
+
+            Symbol::Ampersand => "&",
+            Symbol::Asterisk => "*",
+            Symbol::Div => "/",
+            Symbol::Mod => "%",
+            Symbol::Not => "!",
+            Symbol::BitwiseNot => "~",
+            Symbol::Shl => "<<",
+            Symbol::Shr => ">>",
+
+            Symbol::Lt => "<",
+            Symbol::Le => "<=",
+            Symbol::Gt => ">",
+            Symbol::Ge => ">=",
+            Symbol::Eq => "==",
+            Symbol::Ne => "!=",
+            Symbol::Xor => "^",
+            Symbol::Or => "|",
+            Symbol::LAnd => "&&",
+            Symbol::LOr => "||",
+
+            Symbol::Assign => "=",
+            Symbol::AssignAdd => "+=",
+            Symbol::AssignSub => "-=",
+            Symbol::AssignMul => "*=",
+            Symbol::AssignDiv => "/=",
+            Symbol::AssignShl => "<<=",
+            Symbol::AssignShr => ">>=",
+            Symbol::AssignAnd => "&=",
+            Symbol::AssignXor => "^=",
+            Symbol::AssignOr => "|=",
+
+            Symbol::Hash => "#",
+            Symbol::Question => "?",
+            Symbol::Vararg => "...",
+        };
+
+        write!(f, "{}", m)
     }
 }
 

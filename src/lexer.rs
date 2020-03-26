@@ -13,17 +13,8 @@ pub struct Token {
 }
  */
 
-type Token = TokenValue;
+pub type Token = TokenValue;
 type LexResult = Result<Token, String>;
-
-macro_rules! matches {
-    ($e:expr, $p:pat) => {
-        match $e {
-            $p => true,
-            _ => false,
-        }
-    };
-}
 
 /*
 impl Token {
@@ -151,7 +142,12 @@ impl<'a> Lexer<'a> {
         symbol.push(c);
         if let Ok(&next_c) = self.peek_next() {
             match c {
-                '+' | '-' => {
+                '+' => {
+                    if next_c == '=' || next_c == c {
+                        symbol.push(self.get_next()?);
+                    }
+                }
+                '-' => {
                     if next_c == '=' || next_c == '>' || next_c == c {
                         symbol.push(self.get_next()?);
                     }
@@ -163,6 +159,12 @@ impl<'a> Lexer<'a> {
                 }
                 '<' | '>' | '&' | '|' => {
                     if next_c == c || next_c == '=' {
+                        symbol.push(self.get_next()?);
+                    }
+                }
+                '.' => {
+                    if self.peek_next()? == &'.' {
+                        symbol.push(self.get_next()?);
                         symbol.push(self.get_next()?);
                     }
                 }
@@ -292,7 +294,7 @@ impl<'a> Lexer<'a> {
                 }
             }
             '(' | ')' | '{' | '}' | '[' | ']' | ',' | ';' | ':' | '.' | '+' | '-' | '*' | '%'
-            | '!' | '~' | '<' | '>' | '^' | '|' | '&' | '=' | '#' => self.lex_symbol(c),
+            | '!' | '~' | '<' | '>' | '^' | '|' | '&' | '=' | '#' | '?' => self.lex_symbol(c),
 
             _ => {
                 // TODO: should handle next file
